@@ -14,7 +14,7 @@
 
         :modules
         {:main
-         {:entries [app.core]}}
+         {:init-fn app.core/init}}
 
         :devtools
         {:http-root   "public"
