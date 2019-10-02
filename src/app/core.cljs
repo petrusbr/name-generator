@@ -1,7 +1,7 @@
 (ns app.core
   (:require [reagent.core :as r]))
 
-(def data (r/atom {:prefixes ["Air" "Jet" "Flight"]
+(defonce data (r/atom {:prefixes ["Air" "Jet" "Flight"]
                    :sufixes ["Hub" "Station" "Mart"]
                    :domains ["Airhub" "AirStation" "AirMart" "JetHub"
                              "JetStation" "JetMart" "FlightHub" "FlighStation"
@@ -22,6 +22,10 @@
            :placeholder placeholder
            :value @valor
            :on-change #(reset! valor (-> % .-target .-value))}])
+
+(defn add-ix
+  [val ix]
+  (swap! data assoc ix (into [@val] (ix @data))))
 
 (defn app
   []
@@ -44,11 +48,9 @@
             [ix-input val "Digite o prefixo"]
             [:div.input-group-append
              [:button {:class "btn btn-info"
-                       :on-click #(js/console.log @val)}
+                       :on-click #(add-ix val :prefixes)}
               [:span {:class "fa fa-plus"}]]]]
-           )
-         
-         ]]]
+           )]]]
       [:div.col-md
        [:h5 "Sufixos "
         [:span {:class "badge badge-info"} (count (:sufixes @data))]]
@@ -58,12 +60,15 @@
           (for [sufix (:sufixes @data)]
             [:li.list-group-item sufix])]
          [:br]
-         [:div.input-group 
-          [:input {:class "form-control" :type "text"
-                   :placeholder "Digite o sufixo"}]
-          [:div.input-group-append
-           [:button {:class "btn btn-info"}
-            [:span {:class "fa fa-plus"}]]]]]]]]
+         (let [val (r/atom "")]
+           [:div.input-group
+            [ix-input val "Digite o sufixo"]
+            [:div.input-group-append
+             [:button {:class "btn btn-info"
+                       :on-click #(add-ix val :sufixes)}
+              [:span {:class "fa fa-plus"}]]]]
+           )
+         ]]]]
      [:br]
      [:h5 "Domínios "
       [:span {:class "badge badge-info"} (count (:domains @data))]]
