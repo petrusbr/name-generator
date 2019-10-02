@@ -15,7 +15,7 @@
    [:h1 "Name Generator"]
    [:h6.text-secondary "Gerador de nomes utilizando ClojureScript e Clojure"]])
 
-(defn ix-input 
+#_(defn ix-input 
   [valor placeholder]
   [:input {:class "form-control" 
            :type "text"
@@ -26,6 +26,20 @@
 (defn add-ix
   [val ix]
   (swap! data assoc ix (into [@val] (ix @data))))
+
+(defn ix-input
+  [valor placeholder kw-ix]
+  [:div.input-group 
+   [:input {:class "form-control"
+            :type "text"
+            :placeholder placeholder
+            :value @valor
+            :on-change #(reset! valor (-> % .-target .-value))}]
+   [:div.input-group-append
+    [:button {:class "btn btn-info"
+              :on-click #(add-ix valor kw-ix)}
+     [:span {:class "fa fa-plus"}]]]])
+
 
 (defn app
   []
@@ -44,13 +58,7 @@
             [:li.list-group-item prefix])]
          [:br]
          (let [val (r/atom "")]
-           [:div.input-group
-            [ix-input val "Digite o prefixo"]
-            [:div.input-group-append
-             [:button {:class "btn btn-info"
-                       :on-click #(add-ix val :prefixes)}
-              [:span {:class "fa fa-plus"}]]]]
-           )]]]
+           [ix-input val "Digite o prefixo" :prefixes])]]]
       [:div.col-md
        [:h5 "Sufixos "
         [:span {:class "badge badge-info"} (count (:sufixes @data))]]
@@ -61,14 +69,7 @@
             [:li.list-group-item sufix])]
          [:br]
          (let [val (r/atom "")]
-           [:div.input-group
-            [ix-input val "Digite o sufixo"]
-            [:div.input-group-append
-             [:button {:class "btn btn-info"
-                       :on-click #(add-ix val :sufixes)}
-              [:span {:class "fa fa-plus"}]]]]
-           )
-         ]]]]
+           [ix-input val "Digite o sufixo" :sufixes])]]]]
      [:br]
      [:h5 "Domínios "
       [:span {:class "badge badge-info"} (count (:domains @data))]]
