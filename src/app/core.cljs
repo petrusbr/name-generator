@@ -6,8 +6,8 @@
                    :domains ["Airhub" "AirStation" "AirMart" "JetHub"
                              "JetStation" "JetMart" "FlightHub" "FlighStation"
                              "FlightMart"]}))
-;; => #'app.core/data
 
+(defonce domains (r/atom [])) ;; Utilizar para implementar VIdeo #3
 
 (defn header
   [] 
@@ -22,6 +22,27 @@
            :placeholder placeholder
            :value @valor
            :on-change #(reset! valor (-> % .-target .-value))}])
+
+;; TODO: Video #2: Utilizar método do splice de JS para remover item do array
+;;       verificar cljs->js, js/....
+
+(defn delete-ix 
+  [valor kw-ix] 
+  (swap! data assoc kw-ix (into [] (filter #(not (= % valor)) (kw-ix @data)))))
+
+;; TODO: Video #2 - Adicionar evento on-keyup.enter ao digitar o prefixo/sufixo
+
+(defn delete-button 
+  [valor kw-ix]
+  [:button {:class "btn btn-info"} 
+   [:span {:class "fa fa-trash"
+           :on-click #(delete-ix valor kw-ix)}]])
+
+;; Video #3: Computed Properties => calcula o novo dominio, i.e. chama a função generate 
+;; sempre que os arrays prefixes e sufixes forem alterados
+;; generate() {
+;; foreach prefix (foreach sufix) this.domains = this.prefix + this.sufix
+;; }
 
 (defn add-ix
   [val ix]
@@ -55,7 +76,11 @@
         [:div.card-body
          [:ul.list-group
           (for [prefix (:prefixes @data)]
-            [:li.list-group-item prefix])]
+            [:li.list-group-item 
+             [:div.row 
+              [:div.col-md prefix]
+              [:div.col-md.text-right 
+               [delete-button prefix :prefixes]]]])]
          [:br]
          (let [val (r/atom "")]
            [ix-input val "Digite o prefixo" :prefixes])]]]
@@ -66,7 +91,11 @@
         [:div.card-body
          [:ul.list-group
           (for [sufix (:sufixes @data)]
-            [:li.list-group-item sufix])]
+            [:li.list-group-item 
+             [:div.row
+              [:div.col-md sufix]
+              [:div.col-md.text-right
+               [delete-button sufix :sufixes]]]])]
          [:br]
          (let [val (r/atom "")]
            [ix-input val "Digite o sufixo" :sufixes])]]]]
